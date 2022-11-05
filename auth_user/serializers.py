@@ -1,13 +1,12 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import update_last_login
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import update_last_login
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.settings import api_settings
 
 from core.models import Role
 
-from rest_framework import serializers
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.settings import api_settings
 
 class UserSerializer(serializers.ModelSerializer):
     def validate_email(self, email_value):
@@ -23,6 +22,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'first_name', 'last_name', 'username',
                   'email', 'role', 'about', 'password', 'date_joined',
+                  'timecreate', 'is_superuser')
+
+class UserReadSerializer(serializers.ModelSerializer):
+    role = serializers.StringRelatedField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'first_name', 'last_name', 'username',
+                  'email', 'role', 'about', 'date_joined',
                   'timecreate', 'is_superuser')
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
