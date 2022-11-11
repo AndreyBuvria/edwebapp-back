@@ -22,10 +22,11 @@ class UserEnvView(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, IsAllowedToGetObject)
     authentication_classes = (JWTAuthentication,)
 
-class TokenObtainPairView(TokenObtainPairView):
+
+class TokenObtainCustomView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-class TokenRefreshView(TokenRefreshView):
+class TokenRefreshCustomView(TokenRefreshView):
     pass
 
 class TokenRefreshVerifyView(TokenVerifyView):
