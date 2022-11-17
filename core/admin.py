@@ -1,10 +1,8 @@
 from django.contrib import admin
 
-from .models import UserProfile, Role
+from .models import UserProfile
 
 # Register your models here.
-
-admin.site.register(Role)
 
 @admin.register(UserProfile)
 class CustomUserAdmin(admin.ModelAdmin):

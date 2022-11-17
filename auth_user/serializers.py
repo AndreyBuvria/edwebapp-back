@@ -5,10 +5,15 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 
-from core.models import Role
-
+class ChoiceField(serializers.ChoiceField):
+    def to_representation(self, obj):
+        if obj == '' and self.allow_blank:
+            return obj
+        return self._choices[obj]
 
 class UserSerializer(serializers.ModelSerializer):
+    role = ChoiceField(choices=get_user_model().USER_LEVEL_CHOICES)
+
     def validate_email(self, email_value):
         if get_user_model().objects.filter(email=email_value):
             raise serializers.ValidationError('A user with that email already exists') 
@@ -25,8 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'timecreate', 'is_superuser')
 
 class UserReadSerializer(serializers.ModelSerializer):
-    role = serializers.StringRelatedField()
-
+    role = ChoiceField(choices=get_user_model().USER_LEVEL_CHOICES)
     class Meta:
         model = get_user_model()
         fields = ('id', 'first_name', 'last_name', 'username',
