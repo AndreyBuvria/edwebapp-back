@@ -1,17 +1,19 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from rest_framework import status, viewsets
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView, TokenVerifyView)
 
 from auth_user.permissions import IsAllowedToGetObject
 
-from .serializers import (CustomTokenObtainPairSerializer, UserReadSerializer,
+from .serializers import (RoleVerifySerializer, UserReadSerializer,
                           UserSerializer)
 
 
@@ -21,9 +23,8 @@ class UserEnvView(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, IsAllowedToGetObject)
     authentication_classes = (JWTAuthentication,)
 
-
 class TokenObtainCustomView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    serializer_class = TokenObtainPairSerializer
 
 class TokenRefreshCustomView(TokenRefreshView):
     pass
@@ -31,6 +32,16 @@ class TokenRefreshCustomView(TokenRefreshView):
 class TokenRefreshVerifyView(TokenVerifyView):
     pass
 
+class RoleVerifyView(GenericAPIView):
+
+    queryset = get_user_model().objects.all()
+    serializer_class = RoleVerifySerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        
 class SignupView(CreateAPIView):
 
     queryset = get_user_model().objects.all()

@@ -11,6 +11,7 @@ urlpatterns = [
     path('token/', views.TokenObtainCustomView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', views.TokenRefreshCustomView.as_view(), name='token_refresh'),
     path('token/verify/', views.TokenRefreshVerifyView.as_view(), name='token-verify'),
+    path('role/verify/', views.RoleVerifyView.as_view(), name='role-verify'),
 
     path('', include(router.urls))
 ]
