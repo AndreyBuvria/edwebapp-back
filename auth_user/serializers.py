@@ -5,7 +5,6 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import AccessToken
 
 from course_api.models import CourseModel
-from course_api.serializers import CourseSerializer
 
 
 class RoleVerifySerializer(serializers.Serializer):
