@@ -29,16 +29,17 @@ class CourseView(viewsets.ModelViewSet):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['get'], detail=True, permission_classes=(IsAuthenticated, ),
+            authentication_classes=(JWTAuthentication, ), url_path='tasks', url_name='tasks')
+    def tasksByCourseId(self, request, pk):
+        task_queryset = TaskModel.objects.all()
+        queryset = self.filter_queryset(task_queryset.filter(related_course=pk))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class TaskView(viewsets.ModelViewSet):
     queryset = TaskModel.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsAuthenticated, )
     authentication_classes = (JWTAuthentication,)
-
-    @action(methods=['get'], detail=True, permission_classes=(IsAuthenticated, ),
-            authentication_classes=(JWTAuthentication, ), url_path='course', url_name='course')
-    def tasksByCourseId(self, request, pk):
-        queryset = self.filter_queryset(self.get_queryset().filter(related_course=pk))
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
