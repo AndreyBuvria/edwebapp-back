@@ -3,12 +3,12 @@ from rest_framework.routers import DynamicRoute, Route, SimpleRouter
 
 from . import views
 
-simpleRouter = SimpleRouter()
+courseRouter = SimpleRouter()
 taskRouter = SimpleRouter()
-simpleRouter.register(r'course', views.CourseView, 'course')
+courseRouter.register(r'course', views.CourseView, 'course')
 taskRouter.register(r'task', views.TaskView, 'task')
 
 urlpatterns = [
-    path('', include(simpleRouter.urls)),
+    path('', include(courseRouter.urls)),
     path('', include(taskRouter.urls))
 ]
