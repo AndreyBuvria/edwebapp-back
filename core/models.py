@@ -12,8 +12,8 @@ class UserProfile(AbstractUser):
         (STUDENT, "Student"),
         (TEACHER, "Teacher"),
     )
-    firstname = models.CharField(max_length=36)
-    lastname = models.CharField(max_length=40)
+    first_name = models.CharField(max_length=36)
+    last_name = models.CharField(max_length=40)
     email = models.EmailField()
     role = models.IntegerField(choices=USER_LEVEL_CHOICES, default=STUDENT)
     about       = models.TextField()

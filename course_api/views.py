@@ -9,6 +9,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import CourseModel, TaskModel
 from .serializers import CourseAddSerializer, CourseListSerializer, TaskSerializer
 
+from core.constants import status_course
+
 # Create your views here.
 
 class CourseView(viewsets.ModelViewSet):
@@ -60,7 +62,7 @@ class CourseView(viewsets.ModelViewSet):
         except:
             return Response(
                 { 
-                    'status': 'FAILED',
+                    'status': status_course.COURSE_CODE_IS_INVALID,
                     'response': {
                         'course': 'A course with such key does not exist' 
                     }
@@ -72,7 +74,7 @@ class CourseView(viewsets.ModelViewSet):
         if not usr_in_course:
             course.members.add(usr_token_data['user_id'])
             return Response(
-                { 'status': 'OK',
+                { 'status': status_course.USER_JOINED,
                     'response': {
                         'course': {
                             'id': course.id
@@ -82,7 +84,7 @@ class CourseView(viewsets.ModelViewSet):
 
         return Response(
             { 
-                'status': 'OK',
+                'status': status_course.USER_ALREADY_JOINED,
                 'response': {
                     'user': 'A user is already part of this course', 
                 }
