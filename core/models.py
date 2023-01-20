@@ -1,16 +1,21 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+from course_api.models import CourseModel
+
 
 # Create your models here.
-
-class Role(models.Model):
-    name    = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.name
-
 class UserProfile(AbstractUser):
-    role        = models.ForeignKey(Role, on_delete=models.CASCADE)
+    STUDENT = 0
+    TEACHER = 1
+    USER_LEVEL_CHOICES = (
+        (STUDENT, "Student"),
+        (TEACHER, "Teacher"),
+    )
+    first_name = models.CharField(max_length=36)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField()
+    role = models.IntegerField(choices=USER_LEVEL_CHOICES, default=STUDENT)
     about       = models.TextField()
     timecreate  = models.DateTimeField(auto_now_add=True)
 
