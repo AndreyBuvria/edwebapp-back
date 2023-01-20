@@ -7,6 +7,12 @@ from .models import CourseModel, TaskModel
 from .constants import model_setting
 
 
+class ChoiceField(serializers.ChoiceField):
+    def to_representation(self, obj):
+        if obj == '' and self.allow_blank:
+            return obj
+        return self._choices[obj]
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskModel
@@ -15,6 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class CourseListSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField()
     members = UserReadSerializer(many=True)
+    access = ChoiceField(choices=CourseModel.ACCESS_CHOICES)
 
     class Meta:
         model = CourseModel

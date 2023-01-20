@@ -28,9 +28,12 @@ class CourseView(viewsets.ModelViewSet):
             return self.serializers['task']
         elif self.action == 'addUserToCourse':
             return self.serializers['add']
-        return self.serializers['default'] 
+        else:
+            return self.serializers['default'] 
 
-    def list(self, request):
+    @action(methods=['get'], detail=False, permission_classes=(IsAuthenticated, ),
+            authentication_classes=(JWTAuthentication, ), url_path='usr_joined', url_name='usr_joined')
+    def getCoursesUserJoinedTo(self, request):
         usr = JWTAuthentication().authenticate(request)[1]
         filtered_queryset = self.get_queryset().filter(members__in=[usr['user_id']]).extra(order_by=('id',))
         queryset = self.filter_queryset(filtered_queryset)
@@ -50,6 +53,28 @@ class CourseView(viewsets.ModelViewSet):
         queryset = self.filter_queryset(task_queryset.filter(related_course=pk))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(methods=['get'], detail=True, permission_classes=(IsAuthenticated, ),
+            authentication_classes=(JWTAuthentication, ), url_path='check_user', url_name='check_user')
+    def checkUserMembership(self, request, pk):
+        usr_token_data = JWTAuthentication().authenticate(request)[1]
+        course = self.get_queryset().get(id=pk)
+        usr_in_course = course.members.filter(id=usr_token_data['user_id'])
+        
+        if not usr_in_course:
+            return Response(
+                {
+                    'status': 'FAILED',
+                    'response': {
+                        'msg': 'A user has not joined to the course'
+                    }
+                }, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(
+            {
+                'status': 'OK',
+                'response': {}
+            }, status=status.HTTP_200_OK)
 
     @action(methods=['patch'], detail=False, permission_classes=(IsAuthenticated, ),
             authentication_classes=(JWTAuthentication, ), url_path='add_user', url_name='add_user')
@@ -66,7 +91,7 @@ class CourseView(viewsets.ModelViewSet):
                     'response': {
                         'course': 'A course with such key does not exist' 
                     }
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_404_NOT_FOUND)
 
         usr_token_data = JWTAuthentication().authenticate(request)[1]
         usr_in_course = course.members.filter(id=usr_token_data['user_id'])
@@ -88,6 +113,40 @@ class CourseView(viewsets.ModelViewSet):
                 'response': {
                     'user': 'A user is already part of this course', 
                 }
+            }, status=status.HTTP_200_OK)
+
+    @action(methods=['patch'], detail=True, permission_classes=(IsAuthenticated, ),
+            authentication_classes=(JWTAuthentication, ), url_path='remove_user', url_name='remove_user')
+    def removeUserFromCourse(self, request, pk):
+        try:
+            course = self.get_queryset().get(id=pk)
+        except:
+            return Response(
+                { 
+                    'status': status_course.COURSE_ID_IS_INVALID,
+                    'response': {
+                        'course': 'A course with such id does not exist' 
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        usr_token_data = JWTAuthentication().authenticate(request)[1]
+        usr_in_course = course.members.filter(id=usr_token_data['user_id'])
+        
+        if not usr_in_course:
+            return Response(
+                {
+                    'status': status_course.USER_IS_NOT_JOINED,
+                    'response': {
+                        'msg': 'A user is not joined to the course'
+                    }
+                }, status=status.HTTP_200_OK
+            )
+
+        course.members.remove(usr_token_data['user_id'])
+        return Response(
+            { 
+                'status': status_course.USER_REMOVED,
+                'response': {} 
             }, status=status.HTTP_200_OK)
 
 

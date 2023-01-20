@@ -13,9 +13,17 @@ def key_generator(size=model_setting['KEY_SIZE'], chars=string.ascii_lowercase +
     return ''.join(random.choice(chars) for _ in range(size))
 
 class CourseModel(models.Model):
-    key = models.CharField(max_length=model_setting['KEY_SIZE'], unique=True, editable=False, default=key_generator())
+    PUBLIC = 0
+    ACCESS = 1
+    ACCESS_CHOICES = (
+        (PUBLIC, "Public"),
+        (ACCESS, "Private"),
+    )
+
+    key = models.CharField(max_length=model_setting['KEY_SIZE'], editable=False, default=key_generator())
     name = models.CharField(max_length=36)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    access = models.IntegerField(choices=ACCESS_CHOICES, default=PUBLIC)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='members')
     description = models.TextField()
     timecreated = models.DateTimeField(auto_now_add=True)

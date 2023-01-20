@@ -4,8 +4,6 @@ from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import AccessToken
 
-from course_api.models import CourseModel
-
 
 class RoleVerifySerializer(serializers.Serializer):
     access = serializers.CharField()

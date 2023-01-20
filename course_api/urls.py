@@ -1,5 +1,5 @@
 from django.urls import include, path
-from rest_framework.routers import DynamicRoute, Route, SimpleRouter
+from rest_framework.routers import SimpleRouter
 
 from . import views
 
